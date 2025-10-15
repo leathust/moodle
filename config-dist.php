@@ -173,7 +173,8 @@ $CFG->dboptions = [
 // If you need both intranet and Internet access please read
 // http://docs.moodle.org/en/masquerading
 
-$CFG->wwwroot   = 'http://example.com/moodle';
+// $CFG->wwwroot   = 'http://example.com/moodle';
+$CFG->wwwroot   = 'https://moodle-714a.onrender.com';
 
 // Generally it is not advisable to use a wwwroot that ends in 'public'.
 // This is because the 'public' directory is used to serve web-accessible content.
