@@ -1,19 +1,21 @@
-# Sử dụng image PHP chính thức có Apache
 FROM php:8.2-apache
 
-# Cài các extension cần cho Moodle
-RUN apt-get update && apt-get install -y \
+# Cập nhật và cài các package cần thiết
+RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq-dev \
     libxml2-dev \
     libzip-dev \
     libpng-dev \
-    libjpeg-dev \
+    libjpeg62-turbo-dev \
     libfreetype6-dev \
     libicu-dev \
     libonig-dev \
     unzip \
     git \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && rm -rf /var/lib/apt/lists/*
+
+# Cấu hình gd với jpeg/freetype
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install gd intl mbstring xmlrpc soap zip pdo_pgsql pgsql opcache
 
 # Bật mod_rewrite cho Apache
@@ -22,13 +24,13 @@ RUN a2enmod rewrite
 # Copy mã Moodle vào container
 COPY . /var/www/html
 
-# Thiết lập quyền ghi cho thư mục dữ liệu
+# Tạo thư mục dữ liệu Moodle
 RUN mkdir -p /var/www/moodledata && chmod -R 777 /var/www/moodledata
 
-# Đặt thư mục làm working dir
+# Đặt working dir
 WORKDIR /var/www/html
 
-# Expose cổng mặc định
+# Expose cổng 80
 EXPOSE 80
 
 # Khởi động Apache
