@@ -12,6 +12,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libonig-dev \
     unzip \
     git \
+    pkg-config \
+    libwebp-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Cấu hình gd với jpeg/freetype
