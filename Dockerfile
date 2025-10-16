@@ -1,21 +1,35 @@
-# Sử dụng image PHP có Apache sẵn
+# Sử dụng image PHP chính thức có Apache
 FROM php:8.2-apache
 
-# Cài đặt các package và extension cần cho Moodle
+# Cài các extension cần cho Moodle
 RUN apt-get update && apt-get install -y \
-    libpng-dev libjpeg-dev libfreetype6-dev libxml2-dev libicu-dev libzip-dev zip unzip git curl libxslt1-dev libonig-dev libcurl4-openssl-dev libpq-dev \
+    libpq-dev \
+    libxml2-dev \
+    libzip-dev \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    libicu-dev \
+    libonig-dev \
+    unzip \
+    git \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd intl soap zip mysqli pdo pdo_mysql pdo_pgsql pgsql xsl \
-    && a2enmod rewrite
+    && docker-php-ext-install gd intl mbstring xmlrpc soap zip pdo_pgsql pgsql opcache
 
-# Copy toàn bộ mã nguồn Moodle vào thư mục web
-COPY . /var/www/html/
+# Bật mod_rewrite cho Apache
+RUN a2enmod rewrite
 
-# Tạo và phân quyền cho thư mục moodledata
-RUN mkdir -p /var/www/moodledata && chown -R www-data:www-data /var/www/html /var/www/moodledata
+# Copy mã Moodle vào container
+COPY . /var/www/html
 
-# Expose cổng 80 cho HTTP
+# Thiết lập quyền ghi cho thư mục dữ liệu
+RUN mkdir -p /var/www/moodledata && chmod -R 777 /var/www/moodledata
+
+# Đặt thư mục làm working dir
+WORKDIR /var/www/html
+
+# Expose cổng mặc định
 EXPOSE 80
 
-# Chạy Apache
+# Khởi động Apache
 CMD ["apache2-foreground"]
