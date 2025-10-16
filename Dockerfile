@@ -26,7 +26,7 @@ RUN docker-php-ext-configure gd \
 # Bật mod_rewrite cho Apache
 RUN a2enmod rewrite
 
-# Copy mã Moodle
+# Copy code Moodle
 COPY . /var/www/html
 
 # Tạo thư mục dữ liệu Moodle
