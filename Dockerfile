@@ -1,6 +1,6 @@
 FROM php:8.2-apache
 
-# Cập nhật và cài các package cần thiết
+# Cài package cần thiết
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq-dev \
     libxml2-dev \
@@ -10,30 +10,33 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libfreetype6-dev \
     libicu-dev \
     libonig-dev \
+    libwebp-dev \
+    pkg-config \
     unzip \
     git \
-    pkg-config \
-    libwebp-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Cấu hình gd với jpeg/freetype
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+# Configure và cài GD + các extension Moodle cần
+RUN docker-php-ext-configure gd \
+        --with-freetype=/usr/include/ \
+        --with-jpeg=/usr/include/ \
+        --with-webp=/usr/include/ \
     && docker-php-ext-install gd intl mbstring xmlrpc soap zip pdo_pgsql pgsql opcache
 
 # Bật mod_rewrite cho Apache
 RUN a2enmod rewrite
 
-# Copy mã Moodle vào container
+# Copy mã Moodle
 COPY . /var/www/html
 
 # Tạo thư mục dữ liệu Moodle
 RUN mkdir -p /var/www/moodledata && chmod -R 777 /var/www/moodledata
 
-# Đặt working dir
+# Working directory
 WORKDIR /var/www/html
 
 # Expose cổng 80
 EXPOSE 80
 
-# Khởi động Apache
+# Start Apache
 CMD ["apache2-foreground"]
