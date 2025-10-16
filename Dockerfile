@@ -1,39 +1,12 @@
-FROM php:8.2-apache
+# Dùng Moodle official Docker image
+FROM bitnami/moodle:5.1
 
-# Cài các package cần thiết
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libpq-dev \
-    libxml2-dev \
-    libzip-dev \
-    libpng-dev \
-    libjpeg62-turbo-dev \
-    libfreetype6-dev \
-    libicu-dev \
-    libonig-dev \
-    libwebp-dev \
-    pkg-config \
-    unzip \
-    git \
-    && rm -rf /var/lib/apt/lists/*
+# Set environment variables Moodle cần
+ENV MOODLE_DATABASE_HOST=postgresql://moodle_db_84oa_user:oC7880MhXgGOQ3cRgMa5xVyQ4e3Jq4Sp@dpg-d3o6tebipnbc73fo2omg-a/moodle_db_84oa
+ENV MOODLE_DATABASE_PORT_NUMBER=5432
+ENV MOODLE_DATABASE_USER=moodle_db_84oa_user
+ENV MOODLE_DATABASE_NAME=moodle_db_84oa
+ENV MOODLE_DATABASE_PASSWORD=oC7880MhXgGOQ3cRgMa5xVyQ4e3Jq4Sp
 
-# Configure GD đúng với PHP 8.2
-RUN docker-php-ext-configure gd \
-        --with-freetype \
-        --with-jpeg \
-        --with-webp \
-        --with-png \
-    && docker-php-ext-install gd intl mbstring xmlrpc soap zip pdo_pgsql pgsql opcache
-
-# Bật mod_rewrite Apache
-RUN a2enmod rewrite
-
-# Copy mã Moodle
-COPY . /var/www/html
-
-# Tạo thư mục dữ liệu
-RUN mkdir -p /var/www/moodledata && chmod -R 777 /var/www/moodledata
-
-WORKDIR /var/www/html
-EXPOSE 80
-
-CMD ["apache2-foreground"]
+# Moodle data folder
+ENV MOODLE_VOLUME=/bitnami/moodledata
